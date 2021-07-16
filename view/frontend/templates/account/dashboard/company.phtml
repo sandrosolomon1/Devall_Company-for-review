@@ -1,0 +1,25 @@
+<?php
+/**
+ * @var Devall\Company\Block\Account\Dashboard\Company $block
+ */
+   $Company = $block->getCompanyData();
+?>
+
+<div class="block block-dashboard-company">
+    <div class="block-title">
+        <strong><?= $block->escapeHtml(__('Company Information')) ?></strong>
+        <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('company/company/edit')) ?>"><span><?= $block->escapeHtml(__('Change Associated Company')) ?></span></a>
+    </div>
+    <div class="box box-information">
+        <strong class="box-title">
+            <span><?= $Company->Name ?></span>
+        </strong>
+        <div class="box-content">
+            <p>
+                <?= $Company->Country ?><br>
+                <?= $Company->Street ?><br>
+                <?= $Company->Number ?><br>
+            </p>
+        </div>
+    </div>
+</div>

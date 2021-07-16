@@ -1,0 +1,57 @@
+<?php
+/**
+ * @var Devall\Company\Block\Account\CompanyData $block
+ */
+$companies = $block->getCompaniesCollection();
+//var_dump($block->getCustomerCompanyId());
+//var_dump($companies->getData()[0]);
+?>
+
+<form method="post" action="<?= $block->escapeUrl($block->getAction()) ?>">
+    <?= $block->getBlockHtml('formkey') ?>
+    <select name="company" id="company">
+        <?php foreach ($companies as $company): ?>
+            <option
+                    value="<?= $company->getId() ?>"
+                    <?php if($company->getId() == (int)$block->getCustomerCompanyId()): ?> selected <?php endif ?>
+            >
+                    <?= $company->getName() ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+    <br>
+    <br>
+    <div class="primary">
+        <button type="submit"
+                class="action save primary"
+                title="<?= $block->escapeHtmlAttr(__('Save')) ?>">
+            <span><?= $block->escapeHtml(__('Save')) ?></span>
+        </button>
+    </div>
+</form>
+
+<div id="details" data-bind="scope: 'company'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+
+<script type="text/x-magento-init">
+{
+    "#details": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "company": {
+                    "component": "Devall_Company/js/company",
+                    "config" : {
+                         "country" : "<?= $block->getCompany()->getCountry() ?>",
+                         "street" : "<?= $block->getCompany()->getStreet() ?>",
+                         "street_number" : "<?= $block->getCompany()->getNumber() ?>",
+                         "size" : "<?= $block->getCompany()->getSize() ?>",
+                         "rest_api_url" : "<?= $block->getRestApiUrl() ?>",
+                         "template" : "Devall_Company/details"
+                    }
+                }
+            }
+        }
+    }
+}
+</script>
