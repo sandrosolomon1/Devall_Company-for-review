@@ -3,9 +3,10 @@
 namespace Devall\Company\Setup\Patch\Data;
 
 use Magento\Customer\Api\CustomerMetadataInterface;
+use Magento\Eav\Api\AttributeRepositoryInterface;
+use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchRevertableInterface;
-use Magento\Eav\Setup\EavSetup;
 use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Eav\Model\Config;
 
@@ -20,21 +21,35 @@ class CustomerCompanyAttribute
     private $eavSetupFactory;
 
     /**
-     * @var \Magento\Framework\Setup\ModuleDataSetupInterface
+     * @var ModuleDataSetupInterface
      */
     private $moduleDataSetup;
 
     /**
-     * @param \Magento\Framework\Setup\ModuleDataSetupInterface $moduleDataSetup
+     * @var AttributeRepositoryInterface
+     */
+    private $attributeRepository;
+    /**
+     * @var Config
+     */
+    private $eavConfig;
+
+    /**
+     * @param ModuleDataSetupInterface $moduleDataSetup
+     * @param EavSetupFactory $eavSetupFactory
+     * @param Config $eavConfig
+     * @param AttributeRepositoryInterface $attributeRepository
      */
     public function __construct(
-        \Magento\Framework\Setup\ModuleDataSetupInterface $moduleDataSetup,
+        ModuleDataSetupInterface $moduleDataSetup,
         EavSetupFactory $eavSetupFactory,
-        Config $eavConfig
+        Config $eavConfig,
+        AttributeRepositoryInterface $attributeRepository
     ) {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->eavSetupFactory = $eavSetupFactory;
         $this->eavConfig       = $eavConfig;
+        $this->attributeRepository = $attributeRepository;
     }
 
     /**
@@ -75,7 +90,7 @@ class CustomerCompanyAttribute
                 'customer_account_edit'
             ]);
 
-        $companyAttribute->save();
+        $this->attributeRepository->save($companyAttribute);
 
         $this->moduleDataSetup->getConnection()->endSetup();
     }
