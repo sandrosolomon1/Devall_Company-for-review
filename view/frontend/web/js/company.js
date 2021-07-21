@@ -35,10 +35,10 @@ define([
                 }
 
                 function setCompanyDetails(data) {
-                    root.country(data[1]);
-                    root.street(data[3]);
-                    root.street_number(data[4]);
-                    root.size(data[5]);
+                    root.country(data.country);
+                    root.street(data.street);
+                    root.street_number(data.number);
+                    root.size(data.size);
                 }
             }
         });
