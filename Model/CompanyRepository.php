@@ -78,7 +78,7 @@ class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterfac
      * @inheridoc
      */
     public function getByIdApi(int $id) {
-        return $this->getById($id)->getData();
+        return $this->getById($id);
     }
 
     /**
