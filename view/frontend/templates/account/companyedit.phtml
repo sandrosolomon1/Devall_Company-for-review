@@ -3,19 +3,16 @@
  * @var Devall\Company\Block\Account\CompanyData $block
  */
 $companies = $block->getCompaniesCollection();
-//var_dump($block->getCustomerCompanyId());
-//var_dump($companies->getData()[0]);
 ?>
-
 <form method="post" action="<?= $block->escapeUrl($block->getAction()) ?>">
     <?= $block->getBlockHtml('formkey') ?>
     <select name="company" id="company">
         <?php foreach ($companies as $company): ?>
             <option
-                    value="<?= $company->getId() ?>"
-                    <?php if($company->getId() == (int)$block->getCustomerCompanyId()): ?> selected <?php endif ?>
+                value="<?= $company->getId() ?>"
+                <?php if((string)$company->getId() === $block->getCustomerCompanyId()): ?> selected <?php endif ?>
             >
-                    <?= $company->getName() ?>
+                <?= $company->getName() ?>
             </option>
         <?php endforeach; ?>
     </select>
@@ -30,7 +27,7 @@ $companies = $block->getCompaniesCollection();
     </div>
 </form>
 
-<div id="details" data-bind="scope: 'company'">
+<div id="details" data-bind="scope: 'company-details'">
     <!-- ko template: getTemplate() --><!-- /ko -->
 </div>
 
@@ -39,8 +36,8 @@ $companies = $block->getCompaniesCollection();
     "#details": {
         "Magento_Ui/js/core/app": {
             "components": {
-                "company": {
-                    "component": "Devall_Company/js/company",
+                "company-details": {
+                    "component": "Devall_Company/js/company-details",
                     "config" : {
                          "country" : "<?= $block->getCompany()->getCountry() ?>",
                          "street" : "<?= $block->getCompany()->getStreet() ?>",
@@ -55,3 +52,4 @@ $companies = $block->getCompaniesCollection();
     }
 }
 </script>
+
