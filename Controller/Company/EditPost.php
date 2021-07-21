@@ -88,8 +88,6 @@ class EditPost extends Action {
                 $this->messageManager->addSuccessMessage(__("Data Saved."));
             } catch (Exception $e) {
                 $this->messageManager->addErrorMessage($e, __("We can\'t submit your request, Please try again."));
-            } catch (NoSuchEntityException $e) {
-                $this->messageManager->addErrorMessage($e);
             }
         }
 
