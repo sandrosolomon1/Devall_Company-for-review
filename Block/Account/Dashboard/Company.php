@@ -48,32 +48,20 @@ class Company extends Template
     }
 
     /**
-     * @return object
-     */
-    public function getCompanyData(): object
-    {
-        $company = $this->getCompany();
-
-        return (object) [
-            "Id" => $company->getId(),
-            "Name" => $company->getName(),
-            "Country" => $company->getCountry(),
-            "Street" => $company->getStreet(),
-            "Number" => $company->getNumber(),
-            "Size" => $company->getSize()
-        ];
-    }
-
-    /**
-     * @return \Devall\Company\Api\Data\CompanyInterface
+     * @return \Devall\Company\Api\Data\CompanyInterface|null
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getCompany(): \Devall\Company\Api\Data\CompanyInterface
+    public function getCompany(): ?\Devall\Company\Api\Data\CompanyInterface
     {
-        $costumer = $this->customerRepositoryInterface->getById($this->getCustomerId());
-        $companyid = $costumer->getCustomAttribute(CompanyModel::COMPANY_ATTRIBUTE_CODE)->getValue();
-        return $this->companyRepository->getById($companyid);
+        $customer = $this->customerRepositoryInterface->getById($this->getCustomerId());
+        $attr = $customer->getCustomAttribute(CompanyModel::COMPANY_ATTRIBUTE_CODE);
+
+        if(!$attr) {
+            return null;
+        }
+
+        return $this->companyRepository->getById($attr->getValue());
     }
 
     /**
