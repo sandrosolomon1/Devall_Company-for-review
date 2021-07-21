@@ -6,7 +6,7 @@ use Magento\Framework\View\Element\Template;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Model\Session as CustomerSession;
 use Devall\Company\Model\CompanyRepository;
-use Devall\Company\Model\ResourceModel\Company\Collection;
+use Devall\Company\Model\ResourceModel\Company\CollectionFactory;
 use Devall\Company\Model\Company as CompanyModel;
 
 class CompanyData extends Template {
@@ -14,7 +14,7 @@ class CompanyData extends Template {
     const REST_API_URL = 'rest/V1/devall_company';
 
     /**
-     * @var Collection
+     * @var Devall\Company\Model\ResourceModel\Company\Collection
      */
     private $collection;
     /**
@@ -33,24 +33,24 @@ class CompanyData extends Template {
     /**
      * CompanyData constructor.
      * @param Template\Context $context
-     * @param Collection $Collection
-     * @param CompanyRepository $CompanyRepository
-     * @param CustomerSession $CustomerSession
-     * @param CustomerRepositoryInterface $CustomerRepositoryInterface
+     * @param Collection $collection
+     * @param CompanyRepository $companyRepository
+     * @param CustomerSession $customerSession
+     * @param CustomerRepositoryInterface $customerRepositoryInterface
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
-        Collection $Collection,
-        CompanyRepository $CompanyRepository,
-        CustomerSession $CustomerSession,
-        CustomerRepositoryInterface $CustomerRepositoryInterface,
+        CollectionFactory $collectionFactory,
+        CompanyRepository $companyRepository,
+        CustomerSession $customerSession,
+        CustomerRepositoryInterface $customerRepositoryInterface,
         array $data = []
     ) {
-        $this->companyRepository = $CompanyRepository;
-        $this->customerSession = $CustomerSession;
-        $this->collection = $Collection;
-        $this->customerRepositoryInterface = $CustomerRepositoryInterface;
+        $this->companyRepository = $companyRepository;
+        $this->customerSession = $customerSession;
+        $this->collection = $collectionFactory->create();
+        $this->customerRepositoryInterface = $customerRepositoryInterface;
         parent::__construct($context, $data);
     }
 
@@ -66,11 +66,18 @@ class CompanyData extends Template {
         return $customer->getCustomAttribute(CompanyModel::COMPANY_ATTRIBUTE_CODE);
     }
 
+    /**
+     * @return mixed|null
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function getCustomerCompanyId()
     {
         $companyAttribute = $this->getCompanyAttribute();
 
-        if (empty($companyAttribute)) return false;
+        if (!$companyAttribute) {
+            return null;
+        }
         return $companyAttribute->getValue();
     }
 
@@ -83,23 +90,21 @@ class CompanyData extends Template {
     }
 
     /**
-     * @return Collection
+     * @return Devall\Company\Model\ResourceModel\Company\Collection|\Devall\Company\Model\ResourceModel\Company\Collection
      */
-    public function getCompaniesCollection(): Collection
+    public function getCompaniesCollection()
     {
         return $this->collection;
     }
 
     /**
-     * @return \Devall\Company\Api\Data\CompanyInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return \Devall\Company\Api\Data\CompanyInterface|CompanyModel
      * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getCompany(): \Devall\Company\Api\Data\CompanyInterface
+    public function getCompany()
     {
-        $costumer = $this->customerRepositoryInterface->getById($this->getCustomerId());
-        $companyid = $costumer->getCustomAttribute(CompanyModel::COMPANY_ATTRIBUTE_CODE)->getValue();
-        return $this->companyRepository->getById($companyid);
+        return $this->companyRepository->getById($this->getCustomerCompanyId());
     }
 
     /**
@@ -107,9 +112,12 @@ class CompanyData extends Template {
      */
     public function getAction(): string
     {
-        return $this->getUrl('company/company/editpost');
+        return $this->getUrl('devall/company/editpost');
     }
 
+    /**
+     * @return string
+     */
     public function getRestApiUrl() {
         return self::REST_API_URL;
     }
