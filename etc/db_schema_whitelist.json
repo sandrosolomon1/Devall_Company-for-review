@@ -1,17 +1,5 @@
 {
-    "rh_helloworld": {
-        "column": {
-            "entity_id": true,
-            "name": true,
-            "country": true,
-            "srteet": true,
-            "street_number": true
-        },
-        "constraint": {
-            "PRIMARY": true
-        }
-    },
-    "Devall_Company": {
+    "devall_company": {
         "column": {
             "entity_id": true,
             "name": true,
