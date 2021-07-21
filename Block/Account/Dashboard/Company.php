@@ -57,11 +57,10 @@ class Company extends Template
         $customer = $this->customerRepositoryInterface->getById($this->getCustomerId());
         $attr = $customer->getCustomAttribute(CompanyModel::COMPANY_ATTRIBUTE_CODE);
 
-        if(!$attr) {
-            return null;
+        if(isset($attr)) {
+            return $this->companyRepository->getById($attr->getValue());
         }
-
-        return $this->companyRepository->getById($attr->getValue());
+        return null;
     }
 
     /**
