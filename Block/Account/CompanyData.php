@@ -98,13 +98,15 @@ class CompanyData extends Template {
     }
 
     /**
-     * @return \Devall\Company\Api\Data\CompanyInterface|CompanyModel
+     * @return \Devall\Company\Api\Data\CompanyInterface|CompanyModel|null
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getCompany()
     {
-        return $this->companyRepository->getById($this->getCustomerCompanyId());
+        $companyId = $this->getCustomerCompanyId();
+        if(!$companyId) return null;
+        return $this->companyRepository->getById($companyId);
     }
 
     /**
