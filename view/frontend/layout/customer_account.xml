@@ -6,7 +6,7 @@
             >
                 <arguments>
                     <argument name="label" xsi:type="string" translate="true">Company Information</argument>
-                    <argument name="path" xsi:type="string">company/company/edit</argument>
+                    <argument name="path" xsi:type="string">devall/company/edit</argument>
                     <argument name="sortOrder" xsi:type="number">200</argument>
                 </arguments>
             </block>
