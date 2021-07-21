@@ -2,24 +2,32 @@
 /**
  * @var Devall\Company\Block\Account\Dashboard\Company $block
  */
-   $Company = $block->getCompanyData();
+   $company = $block->getCompany();
 ?>
 
 <div class="block block-dashboard-company">
     <div class="block-title">
         <strong><?= $block->escapeHtml(__('Company Information')) ?></strong>
-        <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('company/company/edit')) ?>"><span><?= $block->escapeHtml(__('Change Associated Company')) ?></span></a>
+        <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('devall/company/edit')) ?>"><span><?= $block->escapeHtml(__('Change Associated Company')) ?></span></a>
     </div>
-    <div class="box box-information">
-        <strong class="box-title">
-            <span><?= $Company->Name ?></span>
-        </strong>
-        <div class="box-content">
-            <p>
-                <?= $Company->Country ?><br>
-                <?= $Company->Street ?><br>
-                <?= $Company->Number ?><br>
-            </p>
+    <?php if($company): ?>
+        <div class="box box-information">
+            <strong class="box-title">
+                <span><?= $company->getName() ?></span>
+            </strong>
+            <div class="box-content">
+                <p>
+                    <?= $company->getCountry() ?><br>
+                    <?= $company->getStreet() ?><br>
+                    <?= $company->getNumber() ?><br>
+                </p>
+            </div>
         </div>
-    </div>
+    <?php else: ?>
+        <div class="box box-information">
+            <strong class="box-title">
+                <span><?= $block->escapeHtml(__('No Associated Company')) ?></span>
+            </strong>
+        </div>
+    <?php endif; ?>
 </div>
