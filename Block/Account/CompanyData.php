@@ -11,7 +11,7 @@ use Devall\Company\Model\Company as CompanyModel;
 
 class CompanyData extends Template {
 
-    const REST_API_URL = 'rest/V1/devall_company';
+    const REST_API_URL = '/rest/V1/devall_company';
 
     /**
      * @var Devall\Company\Model\ResourceModel\Company\Collection
@@ -75,10 +75,10 @@ class CompanyData extends Template {
     {
         $companyAttribute = $this->getCompanyAttribute();
 
-        if (!$companyAttribute) {
-            return null;
+        if (isset($companyAttribute)) {
+            return $companyAttribute->getValue();
         }
-        return $companyAttribute->getValue();
+        return null;
     }
 
     /**
@@ -105,8 +105,10 @@ class CompanyData extends Template {
     public function getCompany()
     {
         $companyId = $this->getCustomerCompanyId();
-        if(!$companyId) return null;
-        return $this->companyRepository->getById($companyId);
+        if(isset($companyId)) {
+            $this->companyRepository->getById($companyId);
+        }
+        return null;
     }
 
     /**
