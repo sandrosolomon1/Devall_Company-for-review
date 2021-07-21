@@ -1,9 +1,9 @@
 define([
-        'ko',
         'uiComponent',
+        'ko',
         'jquery'
     ],
-    function(ko, Component, $) {
+    function(Component, ko, $) {
         'use strict';
         return Component.extend({
             country: ko.observable(''),
@@ -13,10 +13,13 @@ define([
 
             initialize: function(config) {
                 this._super();
-                this.country(config.country);
-                this.street(config.street);
-                this.street_number(config.street_number);
-                this.size(config.size);
+                this.country = ko.observable(config.country);
+                this.street = ko.observable(config.street);
+                this.street_number = ko.observable(config.street_number);
+                this.size = ko.observable(config.size);
+                var root = this;
+
+                ourAsyncFunction($('#company').val());
 
                 $('#company').on('change', function() {
                     ourAsyncFunction($(this).val());
@@ -24,21 +27,18 @@ define([
 
                 async function ourAsyncFunction(id) {
                     $.ajax({
-                        url: config.rest_api_url,
-                        contentType: "application/json",
-                        dataType: 'json',
+                        url: `${config.rest_api_url}/${id}`,
                         success: function(res){
-                            console.log(res);
-                            setCompanyDetails(res[id]);
+                            setCompanyDetails(res);
                         }
                     })
                 }
 
                 function setCompanyDetails(data) {
-                    this.country(data.country);
-                    this.street(data.street);
-                    this.streetNumber(data.streetNumber);
-                    this.size(data.size);
+                    root.country(data[1]);
+                    root.street(data[3]);
+                    root.street_number(data[4]);
+                    root.size(data[5]);
                 }
             }
         });
