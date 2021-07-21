@@ -1,32 +1,25 @@
 <?php
 namespace Devall\Company\Model;
 
-use Devall\Company\Api\CompanyRepositoryInterface;
-use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Devall\Company\Api\Data\CompanyInterface;
-use Devall\Company\Api\Data\CompanySearchResultInterface;
-use Devall\Company\Api\Data\CompanySearchResultInterfaceFactory;
-use Devall\Company\Model\ResourceModel\Company\CollectionFactory as CompanyCollectionFactory;
+use Devall\Company\Model\CompanySearchResultFactory;
 use Devall\Company\Model\ResourceModel\Company\Collection;
+use Devall\Company\Model\ResourceModel\Company\CollectionFactory;
+use Devall\Company\Model\ResourceModel\Company as CompanyResourceModel;
+use Devall\Company\Model\CompanyFactory;
 
-class CompanyRepository implements CompanyRepositoryInterface
+class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterface
 {
     /**
      * @var CompanyFactory
      */
-    private $companyfactory;
+    private $companyFactory;
 
     /**
-     * @var CompanyCollectionFactory
+     * @var CompanyResourceModel
      */
-    private $companycollectionfactory;
-
-    /**
-     * @var CompanySearchResultInterfaceFactory
-     */
-    private $companysearchresultinterfacefactory;
+    private $companyResourceModel;
 
     /**
      * @var Collection
@@ -34,34 +27,49 @@ class CompanyRepository implements CompanyRepositoryInterface
     private $collection;
 
     /**
+     * @var CompanySearchResultFactory
+     */
+    private $companySearchResultFactory;
+
+    /**
+     * @var CollectionFactory
+     */
+    private $collectionFactory;
+
+    /**
      * CompanyRepository constructor.
-     * @param CompanyFactory $companyfactory
-     * @param CompanyCollectionFactory $companycollectionfactory
-     * @param CompanySearchResultInterfaceFactory $companysearchresultinterfacefactory
+     * @param CompanyFactory $companyFactory
+     * @param Collection $collection
+     * @param CompanyResourceModel $companyResourceModel
+     * @param CompanySearchResultFactory $companySearchResultFactory
+     * @param CollectionFactory $collectionFactory
      */
     public function __construct
     (
-        CompanyFactory $companyfactory,
-        CompanyCollectionFactory $companycollectionfactory,
-        CompanySearchResultInterfaceFactory $companysearchresultinterfacefactory,
-        Collection $Collection
+        CompanyFactory $companyFactory,
+        Collection $collection,
+        CompanyResourceModel $companyResourceModel,
+        CompanySearchResultFactory $companySearchResultFactory,
+        CollectionFactory $collectionFactory
     )
     {
-        $this->companyfactory = $companyfactory;
-        $this->companycollectionfactory = $companycollectionfactory;
-        $this->companysearchresultinterfacefactory = $companysearchresultinterfacefactory;
-        $this->collection = $Collection;
+        $this->companyFactory = $companyFactory;
+        $this->collection = $collection;
+        $this->companyResourceModel = $companyResourceModel;
+        $this->companySearchResultFactory = $companySearchResultFactory;
+        $this->collectionFactory = $collectionFactory;
     }
 
     /**
      * @inheridoc
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getById($id)
+    public function getById(int $id)
     {
-        $company = $this->companyfactory->create();
-        $company->getResource()->load($company, $id);
-        if (! $company->getId()) {
-            throw new NoSuchEntityException(__('Unable to find company with ID "%1"', $id));
+        $company = $this->companyFactory->create();
+        $this->companyResourceModel->load($company, $id);
+        if (!$company->getId()) {
+            throw new \Magento\Framework\Exception\NoSuchEntityException(__('Unable to find company with ID "%1"', $id));
         }
         return $company;
     }
@@ -70,7 +78,7 @@ class CompanyRepository implements CompanyRepositoryInterface
      * @inheridoc
      */
     public function getByIdApi(int $id) {
-        return json_encode($this->getById($id)->getData());
+        return $this->getById($id)->getData();
     }
 
     /**
@@ -78,7 +86,7 @@ class CompanyRepository implements CompanyRepositoryInterface
      */
     public function save(CompanyInterface $company)
     {
-        $company->getResource()->save($company);
+        $this->companyResourceModel->save($company);
         return $company;
     }
 
@@ -87,13 +95,13 @@ class CompanyRepository implements CompanyRepositoryInterface
      */
     public function delete(CompanyInterface $company)
     {
-        $company->getResource()->delete($company);
+        $this->companyResourceModel->delete($company);
     }
 
     /**
      * @inheridoc
      */
-    public function getList(SearchCriteriaInterface $searchCriteria)
+    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
     {
         $collection = $this->collectionFactory->create();
 
@@ -109,11 +117,16 @@ class CompanyRepository implements CompanyRepositoryInterface
     /**
      * @inheridoc
      */
-    public function getListApi() {
-        return $this->Collection->getData();
+    public function getListApi()
+    {
+        return $this->collection->getData();
     }
 
-    private function addFiltersToCollection(SearchCriteriaInterface $searchCriteria, Collection $collection)
+    /**
+     * @param SearchCriteriaInterface $searchCriteria
+     * @param Collection $collection
+     */
+    private function addFiltersToCollection(SearchCriteriaInterface $searchCriteria, Collection $collection): void
     {
         foreach ($searchCriteria->getFilterGroups() as $filterGroup) {
             $fields = $conditions = [];
@@ -125,23 +138,36 @@ class CompanyRepository implements CompanyRepositoryInterface
         }
     }
 
-    private function addSortOrdersToCollection(SearchCriteriaInterface $searchCriteria, Collection $collection)
+    /**
+     * @param SearchCriteriaInterface $searchCriteria
+     * @param Collection $collection
+     */
+    private function addSortOrdersToCollection(SearchCriteriaInterface $searchCriteria, Collection $collection): void
     {
         foreach ((array) $searchCriteria->getSortOrders() as $sortOrder) {
-            $direction = $sortOrder->getDirection() == SortOrder::SORT_ASC ? 'asc' : 'desc';
+            $direction = $sortOrder->getDirection() === SortOrder::SORT_ASC ? 'asc' : 'desc';
             $collection->addOrder($sortOrder->getField(), $direction);
         }
     }
 
-    private function addPagingToCollection(SearchCriteriaInterface $searchCriteria, Collection $collection)
+    /**
+     * @param SearchCriteriaInterface $searchCriteria
+     * @param Collection $collection
+     */
+    private function addPagingToCollection(SearchCriteriaInterface $searchCriteria, Collection $collection): void
     {
         $collection->setPageSize($searchCriteria->getPageSize());
         $collection->setCurPage($searchCriteria->getCurrentPage());
     }
 
+    /**
+     * @param SearchCriteriaInterface $searchCriteria
+     * @param Collection $collection
+     * @return mixed
+     */
     private function buildSearchResult(SearchCriteriaInterface $searchCriteria, Collection $collection)
     {
-        $searchResults = $this->searchResultFactory->create();
+        $searchResults = $this->companySearchResultFactory->create();
 
         $searchResults->setSearchCriteria($searchCriteria);
         $searchResults->setItems($collection->getItems());
