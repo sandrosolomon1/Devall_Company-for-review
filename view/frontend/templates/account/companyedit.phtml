@@ -3,6 +3,7 @@
  * @var Devall\Company\Block\Account\CompanyData $block
  */
 $companies = $block->getCompaniesCollection();
+$cur = $block->getCompany();
 ?>
 <form method="post" action="<?= $block->escapeUrl($block->getAction()) ?>">
     <?= $block->getBlockHtml('formkey') ?>
@@ -39,10 +40,10 @@ $companies = $block->getCompaniesCollection();
                 "company-details": {
                     "component": "Devall_Company/js/company-details",
                     "config" : {
-                         "country" : "<?= $block->getCompany()->getCountry() ?>",
-                         "street" : "<?= $block->getCompany()->getStreet() ?>",
-                         "street_number" : "<?= $block->getCompany()->getNumber() ?>",
-                         "size" : "<?= $block->getCompany()->getSize() ?>",
+                         "country" : "<?php if($cur) :?> <?=$cur->getCountry()?> <?php endif ?>",
+                         "street" : "<?php if($cur) :?> <?=$cur->getStreet()?> <?php endif ?>",
+                         "street_number" : "<?php if($cur) :?> <?=$cur->getNumber()?> <?php endif ?>",
+                         "size" : "<?php if($cur) :?> <?=$cur->getSize()?> <?php endif ?>",
                          "rest_api_url" : "<?= $block->getRestApiUrl() ?>",
                          "template" : "Devall_Company/details"
                     }
