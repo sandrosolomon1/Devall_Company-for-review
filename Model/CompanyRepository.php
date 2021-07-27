@@ -1,14 +1,20 @@
 <?php
+declare(strict_types=1);
 namespace Devall\Company\Model;
 
+use Devall\Company\Api\Data\CompanySearchResultInterface;
+use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Devall\Company\Api\Data\CompanyInterface;
-use Devall\Company\Model\CompanySearchResultFactory;
 use Devall\Company\Model\ResourceModel\Company\Collection;
 use Devall\Company\Model\ResourceModel\Company\CollectionFactory;
 use Devall\Company\Model\ResourceModel\Company as CompanyResourceModel;
-use Devall\Company\Model\CompanyFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 
+/**
+ * Class CompanyRepository
+ * @package Devall\Company\Model
+ */
 class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterface
 {
     /**
@@ -44,15 +50,13 @@ class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterfac
      * @param CompanySearchResultFactory $companySearchResultFactory
      * @param CollectionFactory $collectionFactory
      */
-    public function __construct
-    (
+    public function __construct(
         CompanyFactory $companyFactory,
         Collection $collection,
         CompanyResourceModel $companyResourceModel,
         CompanySearchResultFactory $companySearchResultFactory,
         CollectionFactory $collectionFactory
-    )
-    {
+    ) {
         $this->companyFactory = $companyFactory;
         $this->collection = $collection;
         $this->companyResourceModel = $companyResourceModel;
@@ -62,14 +66,13 @@ class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterfac
 
     /**
      * @inheridoc
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getById(int $id)
+    public function getById(int $id): CompanyInterface
     {
         $company = $this->companyFactory->create();
         $this->companyResourceModel->load($company, $id);
         if (!$company->getId()) {
-            throw new \Magento\Framework\Exception\NoSuchEntityException(__('Unable to find company with ID "%1"', $id));
+            throw new NoSuchEntityException(__('Unable to find company with ID "%1"', $id));
         }
         return $company;
     }
@@ -77,14 +80,15 @@ class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterfac
     /**
      * @inheridoc
      */
-    public function getByIdApi(int $id) {
+    public function getByIdApi($id): CompanyInterface
+    {
         return $this->getById($id);
     }
 
     /**
      * @inheridoc
      */
-    public function save(CompanyInterface $company)
+    public function save(CompanyInterface $company): CompanyInterface
     {
         $this->companyResourceModel->save($company);
         return $company;
@@ -93,7 +97,7 @@ class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterfac
     /**
      * @inheridoc
      */
-    public function delete(CompanyInterface $company)
+    public function delete(CompanyInterface $company): void
     {
         $this->companyResourceModel->delete($company);
     }
@@ -101,7 +105,7 @@ class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterfac
     /**
      * @inheridoc
      */
-    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
+    public function getList(SearchCriteriaInterface $searchCriteria): CompanySearchResultInterface
     {
         $collection = $this->collectionFactory->create();
 
@@ -117,7 +121,7 @@ class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterfac
     /**
      * @inheridoc
      */
-    public function getListApi()
+    public function getListApi(): array
     {
         return $this->collection->getData();
     }
@@ -175,5 +179,4 @@ class CompanyRepository implements \Devall\Company\Api\CompanyRepositoryInterfac
 
         return $searchResults;
     }
-
 }
