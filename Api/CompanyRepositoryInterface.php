@@ -1,47 +1,54 @@
 <?php
-
+declare(strict_types=1);
 namespace Devall\Company\Api;
 
+use Devall\Company\Api\Data\CompanySearchResultInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Devall\Company\Api\Data\CompanyInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 
-interface CompanyRepositoryInterface {
+/**
+ * Interface CompanyRepositoryInterface
+ * @package Devall\Company\Api
+ */
+interface CompanyRepositoryInterface
+{
 
     /**
      * @param int $id
-     * @return \Devall\Company\Api\Data\CompanyInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function getById(int $id);
-
-    /**
-     * @param int $id
-     * @return \Devall\Company\Api\Data\CompanyInterface
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function getByIdApi(int $id);
-
-    /**
-     * @param \Devall\Company\Api\Data\CompanyInterface $company
-     * @return \Devall\Company\Api\Data\CompanyInterface
-     */
-    public function save(CompanyInterface $company);
-
-    /**
-     * @param \Devall\Company\Api\Data\CompanyInterface $company
-     * @return void
-     */
-    public function delete(CompanyInterface $company);
-
-    /**
-     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @return \Devall\Company\Api\Data\CompanySearchResultsInterface
-     */
-    public function getList(SearchCriteriaInterface $searchCriteria);
-
-    /**
-     * @return \Devall\Company\Api\Data\CompanyInterface[]
+     * @return CompanyInterface
      * @throws NoSuchEntityException
      */
-    public function getListApi();
+    public function getById(int $id): CompanyInterface;
+
+    /**
+     * @param int $id
+     * @return CompanyInterface
+     * @throws NoSuchEntityException
+     */
+    public function getByIdApi(int $id): CompanyInterface;
+
+    /**
+     * @param CompanyInterface $company
+     * @return CompanyInterface
+     */
+    public function save(CompanyInterface $company): CompanyInterface;
+
+    /**
+     * @param CompanyInterface $company
+     * @return void
+     */
+    public function delete(CompanyInterface $company): void;
+
+    /**
+     * @param SearchCriteriaInterface $searchCriteria
+     * @return CompanySearchResultInterface
+     */
+    public function getList(SearchCriteriaInterface $searchCriteria): CompanySearchResultInterface;
+
+    /**
+     * @return CompanyInterface[]
+     * @throws NoSuchEntityException
+     */
+    public function getListApi(): array;
 }
