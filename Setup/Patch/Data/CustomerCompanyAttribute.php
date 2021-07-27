@@ -1,12 +1,18 @@
 <?php
+declare(strict_types=1);
 namespace Devall\Company\Setup\Patch\Data;
 
+use Magento\Framework\Exception\StateException;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Framework\Setup\Patch\PatchRevertableInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
 use Magento\Customer\Setup\CustomerSetupFactory;
-use Magento\Customer\Setup\CustomerSetup;
+use Magento\Eav\Model\AttributeRepository;
 
+/**
+ * Class CustomerCompanyAttribute
+ * @package Devall\Company\Setup\Patch\Data
+ */
 class CustomerCompanyAttribute implements DataPatchInterface, PatchRevertableInterface
 {
 
@@ -14,10 +20,16 @@ class CustomerCompanyAttribute implements DataPatchInterface, PatchRevertableInt
      * @var ModuleDataSetupInterface
      */
     private $moduleDataSetup;
+
     /**
-     * @var CustomerSetup
+     * @var CustomerSetupFactory
      */
     private $customerSetupFactory;
+
+    /**
+     * @var AttributeRepository
+     */
+    private $attributeRepository;
 
     /**
      * Constructor
@@ -27,22 +39,26 @@ class CustomerCompanyAttribute implements DataPatchInterface, PatchRevertableInt
      */
     public function __construct(
         ModuleDataSetupInterface $moduleDataSetup,
-        CustomerSetupFactory $customerSetupFactory
+        CustomerSetupFactory $customerSetupFactory,
+        AttributeRepository $attributeRepository
     ) {
         $this->moduleDataSetup = $moduleDataSetup;
         $this->customerSetupFactory = $customerSetupFactory;
+        $this->attributeRepository = $attributeRepository;
     }
 
     /**
      * {@inheritdoc}
+     * @throws StateException
      */
-    public function apply() {
+    public function apply()
+    {
         $this->moduleDataSetup->getConnection()->startSetup();
-        /** @var CustomerSetup $customerSetup */
+
         $customerSetup = $this->customerSetupFactory->create(['setup' => $this->moduleDataSetup]);
         $customerSetup->addAttribute(
             \Magento\Customer\Model\Customer::ENTITY,
-            'company',
+            'devall_company',
             [
                 'type' => 'int',
                 'label' => 'Company',
@@ -56,17 +72,20 @@ class CustomerCompanyAttribute implements DataPatchInterface, PatchRevertableInt
             ]
         );
 
-        $attribute = $customerSetup->getEavConfig()->getAttribute('customer', 'company')->addData(['used_in_forms' => ['adminhtml_customer']]);
+        $attribute = $customerSetup->getEavConfig()->getAttribute('customer', 'devall_company')->addData(
+            ['used_in_forms' => ['adminhtml_customer']]
+        );
         $attribute->save();
 
         $this->moduleDataSetup->getConnection()->endSetup();
     }
 
-    public function revert() {
+    public function revert()
+    {
         $this->moduleDataSetup->getConnection()->startSetup();
-        /** @var CustomerSetup $customerSetup */
-        $customerSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
-        $customerSetup->removeAttribute(\Magento\Customer\Model\Customer::ENTITY, 'company');
+
+        $customerSetup = $this->customerSetupFactory->create(['setup' => $this->moduleDataSetup]);
+        $customerSetup->removeAttribute(\Magento\Customer\Model\Customer::ENTITY, 'devall_company');
 
         $this->moduleDataSetup->getConnection()->endSetup();
     }
@@ -74,14 +93,16 @@ class CustomerCompanyAttribute implements DataPatchInterface, PatchRevertableInt
     /**
      * {@inheritdoc}
      */
-    public function getAliases() {
+    public function getAliases()
+    {
         return [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getDependencies() {
+    public static function getDependencies()
+    {
         return [
 
         ];
