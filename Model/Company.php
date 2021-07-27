@@ -1,15 +1,20 @@
 <?php
-
+declare(strict_types=1);
 namespace Devall\Company\Model;
 
 use Devall\Company\Api\Data\CompanyInterface;
 
-class Company extends \Magento\Framework\Model\AbstractModel implements CompanyInterface {
-    const COMPANY_ATTRIBUTE_CODE = 'company_attr';
+/**
+ * Class Company
+ * @package Devall\Company\Model
+ */
+class Company extends \Magento\Framework\Model\AbstractModel implements CompanyInterface
+{
+    const COMPANY_ATTRIBUTE_CODE = 'devall_company';
     const ENTITY_ID = 'entity_id';
     const NAME = 'name';
     const COUNTRY = 'country';
-    const STREET = 'srteet';
+    const STREET = 'street';
     const NUMBER = 'street_number';
     const COMPANY_SIZE = 'size';
 
@@ -39,7 +44,7 @@ class Company extends \Magento\Framework\Model\AbstractModel implements CompanyI
      */
     public function getId(): int
     {
-        return $this->_getData(self::ENTITY_ID);
+        return (int)$this->_getData(self::ENTITY_ID);
     }
 
     /**
@@ -101,14 +106,16 @@ class Company extends \Magento\Framework\Model\AbstractModel implements CompanyI
     /**
      * @inheritdoc
      */
-    public function getSize(): int {
-        return $this->_getData(self::COMPANY_SIZE);
+    public function getSize(): int
+    {
+        return (int)$this->_getData(self::COMPANY_SIZE);
     }
 
     /**
      * @inheritdoc
      */
-    public function setSize(int $size): void {
+    public function setSize(int $size): void
+    {
         $this->setData(self::COMPANY_SIZE);
     }
 }
