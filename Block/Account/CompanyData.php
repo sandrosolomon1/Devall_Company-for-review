@@ -1,7 +1,12 @@
 <?php
-
+declare(strict_types=1);
 namespace Devall\Company\Block\Account;
 
+use Devall\Company\Api\Data\CompanyInterface;
+use Devall\Company\Model\ResourceModel\Company\Collection;
+use Magento\Framework\Api\AttributeInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Model\Session as CustomerSession;
@@ -9,14 +14,19 @@ use Devall\Company\Model\CompanyRepository;
 use Devall\Company\Model\ResourceModel\Company\CollectionFactory;
 use Devall\Company\Model\Company as CompanyModel;
 
-class CompanyData extends Template {
+/**
+ * Class CompanyData
+ * @package Devall\Company\Block\Account
+ */
+class CompanyData extends Template
+{
 
     const REST_API_URL = '/rest/V1/devall_company';
 
     /**
-     * @var Devall\Company\Model\ResourceModel\Company\Collection
+     * @var CollectionFactory
      */
-    private $collection;
+    private $collectionFactory;
     /**
      * @var CustomerRepositoryInterface
      */
@@ -33,7 +43,7 @@ class CompanyData extends Template {
     /**
      * CompanyData constructor.
      * @param Template\Context $context
-     * @param Collection $collection
+     * @param CollectionFactory $collectionFactory
      * @param CompanyRepository $companyRepository
      * @param CustomerSession $customerSession
      * @param CustomerRepositoryInterface $customerRepositoryInterface
@@ -49,17 +59,17 @@ class CompanyData extends Template {
     ) {
         $this->companyRepository = $companyRepository;
         $this->customerSession = $customerSession;
-        $this->collection = $collectionFactory->create();
+        $this->collectionFactory = $collectionFactory;
         $this->customerRepositoryInterface = $customerRepositoryInterface;
         parent::__construct($context, $data);
     }
 
     /**
-     * @return \Magento\Framework\Api\AttributeInterface|null
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return AttributeInterface|null
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function getCompanyAttribute(): ?\Magento\Framework\Api\AttributeInterface
+    public function getCompanyAttribute(): ?AttributeInterface
     {
         $customerId = $this->getCustomerId();
         $customer = $this->customerRepositoryInterface->getById($customerId);
@@ -67,16 +77,16 @@ class CompanyData extends Template {
     }
 
     /**
-     * @return mixed|null
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return int|null
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function getCustomerCompanyId()
+    public function getCustomerCompanyId(): ?int
     {
         $companyAttribute = $this->getCompanyAttribute();
 
         if (isset($companyAttribute)) {
-            return $companyAttribute->getValue();
+            return (int)$companyAttribute->getValue();
         }
         return null;
     }
@@ -86,27 +96,27 @@ class CompanyData extends Template {
      */
     public function getCustomerId(): ?int
     {
-        return $this->customerSession->getId();
+        return (int)$this->customerSession->getId();
     }
 
     /**
-     * @return Devall\Company\Model\ResourceModel\Company\Collection|\Devall\Company\Model\ResourceModel\Company\Collection
+     * @return Collection
      */
-    public function getCompaniesCollection()
+    public function getCompaniesCollection(): Collection
     {
-        return $this->collection;
+        return $this->collectionFactory->create();
     }
 
     /**
-     * @return \Devall\Company\Api\Data\CompanyInterface|CompanyModel|null
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return CompanyInterface|null
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function getCompany()
+    public function getCompany(): ?CompanyInterface
     {
         $companyId = $this->getCustomerCompanyId();
-        if(isset($companyId)) {
-            $this->companyRepository->getById($companyId);
+        if (isset($companyId)) {
+            return $this->companyRepository->getById($companyId);
         }
         return null;
     }
@@ -122,7 +132,8 @@ class CompanyData extends Template {
     /**
      * @return string
      */
-    public function getRestApiUrl() {
+    public function getRestApiUrl(): string
+    {
         return self::REST_API_URL;
     }
 }
