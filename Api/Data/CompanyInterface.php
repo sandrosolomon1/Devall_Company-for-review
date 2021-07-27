@@ -1,9 +1,11 @@
 <?php
-
+declare(strict_types=1);
 namespace Devall\Company\Api\Data;
 
-use Magento\Tests\NamingConvention\true\mixed;
-
+/**
+ * Interface CompanyInterface
+ * @package Devall\Company\Api\Data
+ */
 interface CompanyInterface
 {
     /**
