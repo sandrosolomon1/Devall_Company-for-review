@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace Devall\Company\Controller\Company;
 
 use Magento\Framework\App\Action\Action;
@@ -8,13 +8,17 @@ use Devall\Company\Model\Company as CompanyModel;
 use Exception;
 use Magento\Customer\Model\AddressRegistry;
 use Magento\Framework\Data\Form\FormKey\Validator;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\App\Action\Context;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Customer\Model\Session;
 
-class EditPost extends Action {
+/**
+ * Class EditPost
+ * @package Devall\Company\Controller\Company
+ */
+class EditPost extends Action
+{
     /**
      * @var Session
      */
@@ -39,7 +43,6 @@ class EditPost extends Action {
      * @var AddressRegistry
      */
     private $addressRegistry;
-
 
     /**
      * EditPost constructor.
@@ -66,7 +69,10 @@ class EditPost extends Action {
         parent::__construct($context);
     }
 
-    public function execute()
+    /**
+     * @return Redirect
+     */
+    public function execute(): Redirect
     {
         $validFormKey = $this->formKeyValidator->validate($this->getRequest());
 
@@ -91,7 +97,6 @@ class EditPost extends Action {
             }
         }
 
-        /** @var Redirect $resultRedirect */
         $resultRedirect = $this->resultRedirectFactory->create();
         $resultRedirect->setPath('customer/account');
 
