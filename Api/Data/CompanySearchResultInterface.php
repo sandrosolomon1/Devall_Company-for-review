@@ -1,19 +1,20 @@
 <?php
-
+declare(strict_types=1);
 namespace Devall\Company\Api\Data;
 
-use Devall\Company\Api\Data\CompanyInterface;
-use Magento\Framework\Api\SearchResultsInterface;
-
+/**
+ * Interface CompanySearchResultInterface
+ * @package Devall\Company\Api\Data
+ */
 interface CompanySearchResultInterface extends SearchResultsInterface
 {
     /**
-     * @return \Devall\Company\Api\Data\CompanyInterface[]
+     * @return CompanyInterface[]
      */
     public function getItems();
 
     /**
-     * @param \Devall\Company\Api\Data\CompanyInterface[] $items
+     * @param CompanyInterface[] $items
      * @return void
      */
     public function setItems(array $items);
